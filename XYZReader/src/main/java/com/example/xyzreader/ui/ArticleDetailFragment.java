@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.graphics.Palette;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -56,7 +57,7 @@ public class ArticleDetailFragment extends Fragment implements
 
     private int mTopInset;
     private View mPhotoContainerView;
-    private ImageView mPhotoView;
+    private DynamicHeightNetworkImageView mPhotoView;
     private int mScrollY;
     private boolean mIsCard = false;
     private int mStatusBarFullOpacityBottom;
@@ -135,7 +136,7 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
-        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
+        mPhotoView = mRootView.findViewById(R.id.photo);
         mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
 
         mStatusBarColorDrawable = new ColorDrawable(0);
@@ -206,7 +207,7 @@ public class ArticleDetailFragment extends Fragment implements
         TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
 
 
-        bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+        //bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
             mRootView.setAlpha(0);
@@ -232,7 +233,13 @@ public class ArticleDetailFragment extends Fragment implements
                                 + "</font>"));
 
             }
+
+            // This text is too long. Truncation utilized.
+            bodyView.setEllipsize(TextUtils.TruncateAt.END);
+            bodyView.setMaxLines(20);
             bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+
+
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
@@ -240,8 +247,15 @@ public class ArticleDetailFragment extends Fragment implements
                             Bitmap bitmap = imageContainer.getBitmap();
                             if (bitmap != null) {
                                 Palette p = Palette.generate(bitmap, 12);
-                                mMutedColor = p.getDarkMutedColor(0xFF333333);
-                                mPhotoView.setImageBitmap(imageContainer.getBitmap());
+                                mMutedColor = p.getDarkVibrantColor(0xFF333333);
+
+                                // Use the provided DynamicHeightNetworkImageView instead of ImageView
+                                //mPhotoView.setImageBitmap(imageContainer.getBitmap());
+                                mPhotoView.setImageUrl(
+                                        mCursor.getString(ArticleLoader.Query.PHOTO_URL),
+                                        ImageLoaderHelper.getInstance(getActivity()).getImageLoader());
+                                mPhotoView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
+
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
                                 updateStatusBar();

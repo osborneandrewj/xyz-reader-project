@@ -7,25 +7,31 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -184,7 +190,7 @@ public class ArticleListActivity extends AppCompatActivity implements
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(final ViewHolder holder, int position) {
             mCursor.moveToPosition(position);
             holder.titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
@@ -192,6 +198,7 @@ public class ArticleListActivity extends AppCompatActivity implements
 
                 holder.subtitleView.setText(
                         mCursor.getString(ArticleLoader.Query.AUTHOR));
+                // Here to date has been omitted
 //                        Html.fromHtml(
 //                        DateUtils.getRelativeTimeSpanString(
 //                                publishedDate.getTime(),
@@ -205,10 +212,48 @@ public class ArticleListActivity extends AppCompatActivity implements
                         + "<br/>" + " by "
                         + mCursor.getString(ArticleLoader.Query.AUTHOR)));
             }
+
             holder.thumbnailView.setImageUrl(
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
+
+            // Use Picasso to extract the image's colors and set this color as the tile background
+            // Note: Here I would prefer to use Picasso for the complete image loading, but I won't drastically
+            // change the structure of this app.
+            Picasso.with(ArticleListActivity.this)
+                    .load(mCursor.getString(ArticleLoader.Query.THUMB_URL))
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            Palette.from(bitmap)
+                                    .generate(new Palette.PaletteAsyncListener() {
+                                        @Override
+                                        public void onGenerated(Palette palette) {
+                                            Palette.Swatch imageSwatch = palette.getDarkVibrantSwatch();
+                                            if (imageSwatch == null) {
+                                                imageSwatch = palette.getDarkMutedSwatch();
+                                            }
+                                            if (imageSwatch == null) {
+                                                Log.v(TAG, "Got a null swatch");
+                                                return;
+                                            }
+                                            holder.tileBackground.setBackgroundColor(imageSwatch.getRgb());
+                                        }
+                                    });
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                        }
+                    });
+
         }
 
         @Override
@@ -221,12 +266,14 @@ public class ArticleListActivity extends AppCompatActivity implements
         public DynamicHeightNetworkImageView thumbnailView;
         public TextView titleView;
         public TextView subtitleView;
+        public LinearLayout tileBackground;
 
         public ViewHolder(View view) {
             super(view);
             thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
+            tileBackground = view.findViewById(R.id.tile_background);
         }
     }
 }

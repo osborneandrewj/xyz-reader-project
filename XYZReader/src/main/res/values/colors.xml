@@ -18,9 +18,17 @@
 <resources>
     <color name="photo_placeholder">#ccc</color>
 
-    <color name="colorPrimary">#29b6f6</color>
-    <color name="colorPrimaryDark">#0086c3</color>
-    <color name="colorPrimaryLight">#73e8ff</color>
+    <!--<color name="colorPrimary">#29b6f6</color>-->
+    <!--<color name="colorPrimaryDark">#0086c3</color>-->
+    <!--<color name="colorPrimaryLight">#73e8ff</color>-->
+
+    <color name="colorPrimary">#212121</color>
+
+    <color name="colorPrimaryLight">#303030</color>
+
+    <color name="colorPrimaryDark">#000000</color>
+
+
 
     <color name="colorAccent">#FF972E</color>
 
@@ -28,11 +36,15 @@
     <color name="secondaryLightColor">#ffd95a</color>
     <color name="secondaryDarkColor">#c17900</color>
 
+    <!--Text-->
     <color name="primaryTextColor">#000000</color>
-
     <color name="secondaryTextColor">#000000</color>
+    <color name="tileTextColor">#ffffff</color>
 
-    <color name="colorTileBackground">#37474f</color>
+    <!--Article tiles-->
+    <!--<color name="colorTileFooter">#37474f</color>-->
+    <color name="colorTileFooter">#424242</color>
+    <color name="colorTileBackground">#303030</color>
 
 
     <color name="ltgray">#ffe0e0e0</color>

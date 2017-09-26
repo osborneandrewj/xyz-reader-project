@@ -236,7 +236,7 @@ public class ArticleDetailFragment extends Fragment implements
 
             // This text is too long. Truncation utilized.
             bodyView.setEllipsize(TextUtils.TruncateAt.END);
-            bodyView.setMaxLines(20);
+            bodyView.setMaxLines(30);
             bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
 
 

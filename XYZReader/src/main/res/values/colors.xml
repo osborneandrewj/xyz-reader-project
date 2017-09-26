@@ -23,9 +23,7 @@
     <!--<color name="colorPrimaryLight">#73e8ff</color>-->
 
     <color name="colorPrimary">#212121</color>
-
     <color name="colorPrimaryLight">#303030</color>
-
     <color name="colorPrimaryDark">#000000</color>
 
 
@@ -39,12 +37,18 @@
     <!--Text-->
     <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#000000</color>
+    <color name="bodyTextColor">#212121</color>
     <color name="tileTextColor">#ffffff</color>
+    <color name="detailTitleColor">#ffffff</color>
 
     <!--Article tiles-->
-    <!--<color name="colorTileFooter">#37474f</color>-->
     <color name="colorTileFooter">#424242</color>
     <color name="colorTileBackground">#303030</color>
+
+    <!--Detail-->
+    <color name="colorBodyBackground">#FAFAFA</color>
+    <color name="colorMetaBarBackground">#303030</color>
+
 
 
     <color name="ltgray">#ffe0e0e0</color>

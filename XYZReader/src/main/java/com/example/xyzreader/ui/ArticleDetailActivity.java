@@ -59,8 +59,6 @@ public class ArticleDetailActivity extends AppCompatActivity
         // FAB moved from the fragment to this activity in order to properly manage
         // animations per material design specs.
         mFab = findViewById(R.id.share_fab);
-        final Animation fab_fade_in = AnimationUtils.loadAnimation(this, R.anim.fab_fade_in_anim);
-        final Animation fab_fade_out = AnimationUtils.loadAnimation(this, R.anim.fab_fade_out_anim);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,13 +86,11 @@ public class ArticleDetailActivity extends AppCompatActivity
                         .setDuration(300);
                 switch (state) {
                     case ViewPager.SCROLL_STATE_IDLE:
-                        mFab.setVisibility(View.VISIBLE);
-                        mFab.startAnimation(fab_fade_in);
+                        showFab();
                         break;
                     case ViewPager.SCROLL_STATE_DRAGGING:
                     case ViewPager.SCROLL_STATE_SETTLING:
-                        mFab.startAnimation(fab_fade_out);
-                        mFab.setVisibility(View.INVISIBLE);
+                        hideFab();
                         break;
                 }
             }
@@ -170,6 +166,18 @@ public class ArticleDetailActivity extends AppCompatActivity
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mCursor = null;
         mPagerAdapter.notifyDataSetChanged();
+    }
+
+    public void showFab() {
+        mFab.setVisibility(View.VISIBLE);
+        final Animation fab_fade_in = AnimationUtils.loadAnimation(this, R.anim.fab_fade_in_anim);
+        mFab.startAnimation(fab_fade_in);
+    }
+
+    public void hideFab() {
+        mFab.setVisibility(View.INVISIBLE);
+        final Animation fab_fade_out = AnimationUtils.loadAnimation(this, R.anim.fab_fade_out_anim);
+        mFab.startAnimation(fab_fade_out);
     }
 
     public void onUpButtonFloorChanged(long itemId, ArticleDetailFragment fragment) {

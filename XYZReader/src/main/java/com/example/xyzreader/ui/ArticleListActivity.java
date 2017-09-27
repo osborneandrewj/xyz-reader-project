@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -48,8 +49,11 @@ public class ArticleListActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ArticleListActivity.class.toString();
+    private static final String LIST_STATE = "list-state";
+    private Parcelable mSavedListState;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
+    private StaggeredGridLayoutManager mSglm;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     // Use default locale format
@@ -76,11 +80,23 @@ public class ArticleListActivity extends AppCompatActivity implements
         });
 
         mRecyclerView = findViewById(R.id.recycler_view);
-        getLoaderManager().initLoader(0, null, this);
+        int columnCount = getResources().getInteger(R.integer.list_column_count);
+        mSglm = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mSglm);
 
+        // Implement proper data integrity
         if (savedInstanceState == null) {
             refresh();
+        } else {
+            mSavedListState = savedInstanceState.getParcelable(LIST_STATE);
+            if (mSavedListState != null) {
+                mRecyclerView.getLayoutManager().onRestoreInstanceState(mSavedListState);
+            } else {
+                refresh();
+            }
         }
+
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -94,6 +110,12 @@ public class ArticleListActivity extends AppCompatActivity implements
         MenuItem refreshButton = menu.findItem(R.id.refresh);
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(LIST_STATE, mRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
     private void refresh() {
@@ -140,9 +162,9 @@ public class ArticleListActivity extends AppCompatActivity implements
         adapter.setHasStableIds(true);
         mRecyclerView.setAdapter(adapter);
         int columnCount = getResources().getInteger(R.integer.list_column_count);
-        StaggeredGridLayoutManager sglm =
-                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(sglm);
+        mSglm = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mSglm);
+
     }
 
     @Override
